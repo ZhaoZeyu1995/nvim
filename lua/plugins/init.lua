@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    -- event = 'BufWritePre', -- uncomment for format on save
+    event = "BufWritePre", -- uncomment for format on save
     opts = require "configs.conform",
   },
 
@@ -13,28 +13,29 @@ return {
     end,
   },
 
+  -- Copilot setup for autocompletion with Github Copilot
   {
     "github/copilot.vim",
     lazy = false,
   },
 
+  -- Treesitter setup for syntax highlighting
   {
-  	"nvim-treesitter/nvim-treesitter",
-  	opts = {
-  		ensure_installed = {
-  			"vim", "lua", "vimdoc",
-       "html", "css", "python",
-        "c", "cpp",
-  		},
-  	},
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        "vim",
+        "lua",
+        "vimdoc",
+        "html",
+        "css",
+        "python",
+        "c",
+        "cpp",
+      },
+    },
   },
-  {
-  "iamcco/markdown-preview.nvim",
-  cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-  build = "cd app && npm install",
-  init = function()
-    vim.g.mkdp_filetypes = { "markdown" }
-  end,
-  ft = { "markdown" },
-  },
+
+  -- Glow setup for markdown preview
+  { "ellisonleao/glow.nvim", config = true, cmd = "Glow" },
 }
