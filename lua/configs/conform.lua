@@ -4,6 +4,7 @@ local options = {
     python = { "isort", "black" },
     css = { "prettier" },
     html = { "prettier" },
+    shell = { "shfmt" },
   },
 
   format_on_save = {
