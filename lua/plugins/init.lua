@@ -32,6 +32,7 @@ return {
         "python",
         "c",
         "cpp",
+        "bash",
       },
     },
   },
