@@ -19,6 +19,6 @@ M.nvdash = { load_on_startup = true }
 --       tabufline = {
 --          lazyload = false
 --      }
---}
+-- }
 
 return M
