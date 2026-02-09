@@ -19,7 +19,16 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     config = function()
-      require("copilot").setup {}
+      require("copilot").setup {
+        suggestion = {
+          keymap = {
+            accept = "<C-y>",
+            next = "<C-f>",
+            prev = "<C-d>",
+            dismiss = "<C-q>",
+          },
+        },
+      }
     end,
   },
 
@@ -39,6 +48,11 @@ return {
       instructions_file = "avante.md",
       -- for example
       provider = "copilot",
+      providers = {
+        copilot = {
+          model = "claude-opus-4.6",
+        },
+      },
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
