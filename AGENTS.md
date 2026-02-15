@@ -1,43 +1,46 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository is a personal Neovim config built on NvChad (loaded as a plugin, not vendored).
+This repository is a user config layer for NvChad, not a standalone Neovim distribution.
 
-- `init.lua`: entrypoint that bootstraps `lazy.nvim` and loads user modules.
-- `lua/plugins/init.lua`: single source of truth for plugin specs (returns one table).
-- `lua/configs/`: plugin-specific config modules (for example `conform.lua`, `lspconfig.lua`).
-- `lua/options.lua`, `lua/mappings.lua`, `lua/autocmds.lua`: overrides/extensions to NvChad defaults.
-- `lua/chadrc.lua`: UI/theme config matching NvChad’s expected schema.
-- `lazy-lock.json`: pinned plugin versions for reproducible installs.
+- `init.lua`: entrypoint; bootstraps `lazy.nvim`, loads NvChad, then local modules.
+- `lua/plugins/init.lua`: plugin specs and plugin-specific setup hooks.
+- `lua/configs/`: focused config modules (`lazy.lua`, `lspconfig.lua`, `conform.lua`).
+- `lua/options.lua`, `lua/mappings.lua`, `lua/autocmds.lua`: user overrides on top of NvChad defaults.
+- `lua/chadrc.lua`: NvChad UI/theme configuration.
+- `.stylua.toml`: Lua formatting rules.
+
+Keep new config in small single-purpose modules under `lua/configs/` and import them from plugin specs.
 
 ## Build, Test, and Development Commands
-- `nvim --headless "+Lazy! sync" +qa`: install/update plugins from lock/spec.
-- `nvim --headless "+checkhealth" +qa`: run Neovim health checks.
-- `stylua --check lua/`: formatting check for Lua files.
-- `stylua lua/`: apply Lua formatting.
+- `nvim`: launch locally with this config.
+- `nvim --headless "+Lazy! sync" +qa`: install/update plugins non-interactively.
+- `nvim --headless "+checkhealth" +qa`: run Neovim health checks after dependency changes.
+- `stylua init.lua lua`: format all Lua files using repo rules.
 
-Run commands from the repository root (`~/.config/nvim`).
+If you modify formatter/LSP config, run both `checkhealth` and a real editor session to verify behavior.
 
 ## Coding Style & Naming Conventions
-- Follow `.stylua.toml`: 2-space indentation, 120-column width, Unix line endings, double-quote preference.
-- Keep module names lowercase and descriptive (`lua/configs/<plugin>.lua`).
-- Put non-trivial plugin setup in `lua/configs/` and reference it from `lua/plugins/init.lua` via `require "configs.<name>"`.
-- Prefer modern Neovim 0.11 APIs (for example `vim.lsp.enable()`).
+- Language: Lua.
+- Indentation: 2 spaces (enforced by `.stylua.toml`).
+- Max line width: 120.
+- Prefer double quotes where Stylua resolves automatically.
+- Module names: lowercase, descriptive (`configs/conform.lua`).
+- Keep plugin specs declarative; move non-trivial logic into `lua/configs/*.lua`.
 
 ## Testing Guidelines
-There is no automated unit test suite in this repo. Validate changes with:
+There is no formal automated test suite in this repo. Validate changes with:
 
-1. `stylua --check lua/`
-2. `nvim --headless "+Lazy! sync" +qa`
-3. Manual smoke test in Neovim (startup, keymaps, LSP attach, formatting on save).
+1. `stylua init.lua lua`
+2. `nvim --headless "+checkhealth" +qa`
+3. Manual smoke test in Neovim (startup, keymaps, LSP attach, formatting on save, plugin commands such as `:Glow`).
 
-For regressions, test the exact edited area (for example mappings, formatter behavior, or plugin load paths).
+For bug fixes, include reproducible steps in the PR description and verify the fix with a minimal filetype example.
 
 ## Commit & Pull Request Guidelines
-- Use short, imperative commit subjects (history follows patterns like `Add ...`, `Fix ...`, `Update ...`, `Configure ...`).
-- Keep each commit focused on one concern (plugin add, mapping change, formatter fix).
-- PRs should include:
-  - what changed and why,
-  - any user-facing keymap/behavior changes,
-  - verification steps run (commands + manual checks),
-  - linked issue (if applicable).
+Recent history favors short, imperative commit titles (for example: `Add shell formatter shfmt`, `Fix code folding...`).
+
+- Use one logical change per commit.
+- Subject line: imperative mood, concise, and specific.
+- PRs should include: purpose, changed files/modules, validation commands run, and any before/after behavior notes.
+- Link related issue(s) when applicable; include screenshots/GIFs only for UI-visible changes.
