@@ -1,1 +1,2 @@
-lazy-lock.json
+# lazy-lock.json is intentionally tracked so plugin versions are pinned and
+# reproducible on every machine. Do not ignore it.

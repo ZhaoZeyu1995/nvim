@@ -13,29 +13,18 @@ return {
     end,
   },
 
-  -- Copilot setup for autocompletion with Github Copilot
-  {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    config = function()
-      require("copilot").setup {
-        suggestion = {
-          keymap = {
-            accept = "<C-y>",
-            next = "<C-f>",
-            prev = "<C-d>",
-            dismiss = "<C-q>",
-          },
-        },
-      }
-    end,
-  },
-
+  -- Avante driven by Claude Code on your Pro/Max subscription (no API key).
+  -- It talks ACP to the Zed bridge, which proxies to the Claude Code agent
+  -- authenticated via the local `claude` login -- so it uses whichever account
+  -- this machine is signed into.
+  --
+  -- The bridge is launched with `npx`, so a fresh machine needs no manual npm
+  -- step: on first use npx downloads and caches it automatically (requires
+  -- Node.js/npm on PATH). For a faster startup you may optionally pre-install
+  -- it once: `npm install -g @zed-industries/claude-code-acp` and change the
+  -- command below to "claude-code-acp" with empty args.
   {
     "yetone/avante.nvim",
-    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-    -- ⚠️ must add this setting! ! !
     build = vim.fn.has "win32" ~= 0 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
       or "make",
     event = "VeryLazy",
@@ -43,14 +32,15 @@ return {
     ---@module 'avante'
     ---@type avante.Config
     opts = {
-      -- add any opts here
-      -- this file can contain specific instructions for your project
       instructions_file = "avante.md",
-      -- for example
-      provider = "copilot",
-      providers = {
-        copilot = {
-          model = "gpt-5-mini",
+      provider = "claude-code",
+      acp_providers = {
+        ["claude-code"] = {
+          command = "npx",
+          args = { "-y", "@zed-industries/claude-code-acp" },
+          env = {
+            NODE_NO_WARNINGS = "1",
+          },
         },
       },
     },
@@ -59,31 +49,33 @@ return {
       "MunifTanjim/nui.nvim",
       "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
       "stevearc/dressing.nvim", -- for input provider dressing
-      "zbirenbaum/copilot.lua", -- for providers='copilot'
       {
         -- support for image pasting
         "HakonHarnes/img-clip.nvim",
         event = "VeryLazy",
         opts = {
-          -- recommended settings
           default = {
             embed_image_as_base64 = false,
             prompt_for_file_name = false,
             drag_and_drop = {
               insert_mode = true,
             },
-            -- required for Windows users
             use_absolute_path = true,
           },
         },
       },
       {
-        -- Make sure to set this up properly if you have lazy=true
+        -- Nicer in-buffer Markdown rendering; also renders Avante's own
+        -- response buffers. Pulled in here as an Avante dependency.
         "MeanderingProgrammer/render-markdown.nvim",
-        opts = {
-          file_types = { "markdown", "Avante" },
-        },
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
         ft = { "markdown", "Avante" },
+        config = function()
+          -- Patch nvim-treesitter (legacy master) query directives for Neovim
+          -- 0.12+ before any markdown is parsed. See configs/ts_predicates_fix.
+          require "configs.ts_predicates_fix"
+          require("render-markdown").setup { file_types = { "markdown", "Avante" } }
+        end,
       },
     },
   },
