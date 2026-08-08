@@ -33,7 +33,7 @@ There is no formal automated test suite in this repo. Validate changes with:
 
 1. `stylua init.lua lua`
 2. `nvim --headless "+checkhealth" +qa`
-3. Manual smoke test in Neovim (startup, keymaps, LSP attach, formatting on save, plugin commands such as `:Glow`).
+3. Manual smoke test in Neovim (startup, keymaps, LSP attach, formatting on save, plugin commands such as `:Mason`).
 
 For bug fixes, include reproducible steps in the PR description and verify the fix with a minimal filetype example.
 

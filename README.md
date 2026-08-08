@@ -37,7 +37,6 @@ this is the easiest one to miss.
 | A **Nerd Font** | the UI icons | you can tolerate boxes where icons should be — nothing functional breaks |
 | **`claude` CLI** | Avante AI chat/edit | you do not use Avante |
 | **cmake** | generating `compile_commands.json` in *your own* C++ projects | your projects generate it another way — nothing in this config needs cmake to install |
-| **glow** | `:Glow` markdown preview | you do not use it |
 | **pngpaste** / **xclip** / **wl-clipboard** | pasting images into Avante via img-clip | you do not paste images |
 
 Language servers and formatters are **not** in either table — Mason installs
@@ -67,7 +66,7 @@ brew install neovim node
 Optional:
 
 ```bash
-brew install ripgrep cmake glow
+brew install ripgrep cmake
 brew install --cask font-jetbrains-mono-nerd-font
 ```
 
@@ -224,9 +223,6 @@ functional depends on this.
 
 **Clipboard helper** — only for pasting images into Avante via img-clip:
 `pngpaste` on macOS, `xclip` or `wl-clipboard` on Linux.
-
-**glow** — only for `:Glow` markdown preview (`brew install glow`, or from its
-GitHub releases on Linux).
 
 Both macOS and Linux on x86_64 and arm64/aarch64 are supported: Avante's build
 auto-downloads the prebuilt native library for the detected OS and
