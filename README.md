@@ -19,8 +19,31 @@ On first launch, **automatically** (no manual steps):
 - Treesitter parsers listed in `lua/plugins/init.lua` are installed.
 - The Claude Code ACP bridge is fetched on first use of Avante via `npx`
   (cached afterwards) — no global npm install required.
+- Mason installs the language servers and formatters listed in
+  `lua/configs/mason_ensure.lua` (clangd, pyright, lua-language-server,
+  html-lsp, css-lsp, stylua, black, isort, prettier, shfmt). Plugins come from
+  `lazy-lock.json`, but Mason packages are outside it — without this step `gd`
+  would silently do nothing in Python and C++ buffers on a fresh machine.
 
 Let the initial `:Lazy` sync finish, then restart Neovim once.
+
+### Headless / remote servers
+
+The Mason step above runs on the `VeryLazy` event, which never fires without a
+UI. To provision a server without opening the editor, run the bootstrap
+explicitly — it blocks until every package is installed, so it is safe in a
+script:
+
+```bash
+git clone <this-repo> ~/.config/nvim
+nvim --headless "+Lazy! sync" +qa     # plugins
+nvim --headless "+MasonEnsure" +qa    # language servers and formatters
+```
+
+`:MasonEnsure` only installs what is *missing*; it never upgrades behind your
+back (use `:Mason` for that). It also clears broken symlinks left behind by an
+interrupted install, which otherwise make Mason refuse to reinstall a package
+(`"…/mason/bin/clangd" is already linked.`) and leave it silently broken.
 
 ## Prerequisites (these are NOT installed by git)
 
@@ -33,7 +56,7 @@ following system tools must exist on the machine first:
 | **git** | clone repo + plugin installs | `xcode-select --install` |
 | **C compiler + make** | build treesitter parsers; run Avante's build | `xcode-select --install` |
 | **curl + tar** | Avante downloads its prebuilt native libs | preinstalled on macOS/Linux |
-| **Node.js + npm** | runs the Claude Code ACP bridge via `npx` | `brew install node` |
+| **Node.js + npm** | runs the Claude Code ACP bridge via `npx`; also Mason's `pyright` and `prettier` | `brew install node` |
 | **`claude` CLI, logged in** | Avante uses your Claude subscription | see below |
 | **ripgrep** | Telescope live-grep | `brew install ripgrep` |
 | A **Nerd Font** | icons in the UI | e.g. `brew install --cask font-jetbrains-mono-nerd-font` |
@@ -64,6 +87,27 @@ nothing but your local login leaves the machine. Per machine:
    optionally pre-install it: `npm install -g @zed-industries/claude-code-acp`.
 
 Usage: `:AvanteAsk` (or `<leader>aa`) to chat; select code + `<leader>ae` to edit.
+
+## Language support
+
+`gd` jumps to the definition under the cursor. If it is in the current file the
+cursor moves in place; otherwise the file opens as an ordinary buffer in the
+same window, so it appears in the tabufline and closes with `<leader>x`. Use
+`<C-o>` to jump back. Several candidates (C++ overloads, header/source pairs)
+go to the quickfix list.
+
+For **C++**, clangd needs a `compile_commands.json` to resolve `#include`s.
+Without one it guesses compiler flags and cross-file jumps into project headers
+may fail. Generate it with CMake:
+
+```bash
+cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+ln -sf build/compile_commands.json .
+```
+
+For **Python**, pyright resolves imports against the interpreter it finds on
+`PATH`. Inside a virtualenv or conda env, launch `nvim` with that env active,
+or add a `pyrightconfig.json` with `venvPath`/`venv` at the project root.
 
 ## Notes
 

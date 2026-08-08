@@ -13,6 +13,21 @@ return {
     end,
   },
 
+  -- NvChad loads Mason only on :Mason*, which means a fresh clone never
+  -- installs the servers/formatters this config expects. Load it on VeryLazy
+  -- instead and fetch anything missing. See configs/mason_ensure.lua.
+  {
+    "mason-org/mason.nvim",
+    event = "VeryLazy",
+    opts = function()
+      return require "nvchad.configs.mason"
+    end,
+    config = function(_, opts)
+      require("mason").setup(opts)
+      require("configs.mason_ensure").install_missing()
+    end,
+  },
+
   -- Avante driven by Claude Code on your Pro/Max subscription (no API key).
   -- It talks ACP to the Zed bridge, which proxies to the Claude Code agent
   -- authenticated via the local `claude` login -- so it uses whichever account

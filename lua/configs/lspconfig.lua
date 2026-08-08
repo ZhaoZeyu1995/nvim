@@ -1,7 +1,7 @@
 require("nvchad.configs.lspconfig").defaults()
 
--- clangd ships with the Xcode command line tools; pyright is installed via
--- :MasonInstall pyright.
+-- These servers are installed automatically by configs/mason_ensure.lua, so a
+-- fresh clone on another machine works without manual steps.
 local servers = { "html", "cssls", "clangd", "pyright" }
 vim.lsp.enable(servers)
 
