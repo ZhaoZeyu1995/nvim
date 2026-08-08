@@ -7,9 +7,12 @@ machine. It is built on top of [NvChad](https://github.com/NvChad/NvChad)
 ## Setup on a new machine
 
 ```bash
-git clone <this-repo> ~/.config/nvim
+git clone https://github.com/ZhaoZeyu1995/nvim.git ~/.config/nvim
 nvim   # first launch bootstraps lazy.nvim and installs everything
 ```
+
+(Use `git@github.com:ZhaoZeyu1995/nvim.git` instead if you want to push from
+this machine and have an SSH key set up on it.)
 
 On first launch, **automatically** (no manual steps):
 
@@ -35,7 +38,7 @@ explicitly — it blocks until every package is installed, so it is safe in a
 script:
 
 ```bash
-git clone <this-repo> ~/.config/nvim
+git clone https://github.com/ZhaoZeyu1995/nvim.git ~/.config/nvim
 nvim --headless "+Lazy! sync" +qa     # plugins
 nvim --headless "+MasonEnsure" +qa    # language servers and formatters
 ```
