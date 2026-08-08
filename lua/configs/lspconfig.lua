@@ -14,7 +14,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     vim.keymap.set("n", "gd", require("configs.lsp_definition").goto_definition, {
       buffer = args.buf,
-      desc = "LSP Go to definition (new tab if another file)",
+      desc = "LSP Go to definition",
     })
   end,
 })

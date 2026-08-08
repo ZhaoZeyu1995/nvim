@@ -1,37 +1,21 @@
--- Go-to-definition that keeps same-file jumps in place, but sends
--- cross-file jumps to their own tab.
+-- Go-to-definition that always stays in the current window.
 --
 -- `vim.lsp.buf.definition` already lands on the exact line and column of the
--- definition; the only thing it does not do is choose a window. We pass an
--- `on_list` handler so we can make that choice ourselves.
+-- definition. We pass an `on_list` handler purely to centre the result on
+-- screen and to keep the multi-candidate case in the quickfix list.
+--
+-- A definition in another file is opened as an ordinary buffer in this
+-- window, so it shows up in NvChad's tabufline and closes with <leader>x.
 
 local M = {}
 
--- Move the cursor within the current window, recording the jump so <C-o>
--- comes back here, and centre the definition on screen.
+-- Move the cursor, recording the jump so <C-o> comes back here, and centre
+-- the definition on screen.
 local function jump_to(item)
   vim.cmd "normal! m'"
   local line_count = vim.api.nvim_buf_line_count(0)
   vim.api.nvim_win_set_cursor(0, { math.min(item.lnum, line_count), math.max(item.col - 1, 0) })
   vim.cmd "normal! zz"
-end
-
--- If `path` is already visible in some tab, focus that window instead of
--- opening yet another tab for it.
-local function focus_existing_window(path)
-  local bufnr = vim.fn.bufnr(path)
-  if bufnr == -1 then
-    return false
-  end
-
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    if vim.api.nvim_win_get_buf(win) == bufnr then
-      vim.api.nvim_set_current_win(win)
-      return true
-    end
-  end
-
-  return false
 end
 
 local function handle_list(options)
@@ -54,17 +38,11 @@ local function handle_list(options)
   local target = vim.fn.fnamemodify(item.filename, ":p")
   local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
 
-  if target == current then
-    jump_to(item)
-    return
-  end
-
-  -- Push the origin onto the jumplist before we leave this window, so <C-o>
-  -- still works after switching back to this tab.
-  vim.cmd "normal! m'"
-
-  if not focus_existing_window(target) then
-    vim.cmd("tabedit " .. vim.fn.fnameescape(target))
+  if target ~= current then
+    -- Push the origin onto the jumplist before switching buffers, so <C-o>
+    -- still returns to the call site.
+    vim.cmd "normal! m'"
+    vim.cmd("edit " .. vim.fn.fnameescape(target))
   end
 
   jump_to(item)
